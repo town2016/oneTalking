@@ -2,6 +2,12 @@ import React from 'react'
 import '../static/less/list.less'
 import {avatar, commentIcon} from '../static/img/images.js'
 import moment from 'moment'
+import {connect} from 'react-redux'
+import {setGallery} from '../store/hot'
+@connect(
+  null,
+  {setGallery}
+)
 class List extends React.Component {
   constructor (props) {
     super(props)
@@ -30,15 +36,15 @@ class List extends React.Component {
                       { item.imgList.length > 1 &&
                         <ul className='imgList clearfix'>
                           {item.imgList.map((imgItem, imgIndex) => (
-                            <li className='imgItem' key={imgIndex} onClick={this.openImgView.bind(this, imgIndex)}>
+                            <li className='imgItem' key={imgIndex} onClick={this.openImgView.bind(this, imgIndex, item.imgList)}>
                               <img src={imgItem.url} alt='img'/>
                             </li>
                           ))}
                         </ul>
                       }
                       {item.imgList.length === 1 &&
-                        <div className='img-border' onClick={this.openImgView}>
-                          <img src={avatar} width='100%' alt='img'/>
+                        <div className='img-border' onClick={this.openImgView.bind(this, 0, item.imgList)}>
+                          <img src={item.imgList[0].url} width='100%' alt='img'/>
                         </div>
                       }
                     </div>
@@ -94,7 +100,8 @@ class List extends React.Component {
     actionSheet.classList.toggle('opend')
   }
   
-  openImgView (index) {
+  openImgView (index, imgList) {
+    this.props.setGallery({imgList: imgList})
     this.props.openView(index)
   }
 }

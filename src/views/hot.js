@@ -8,7 +8,7 @@ class Hot extends Component {
       list: [{a: 1,imgList: [
         {url: 'https://f10.baidu.com/it/u=2465775762,1509670197&fm=72'},
         {url: 'https://f12.baidu.com/it/u=642753244,1588215304&fm=72'},
-        {url: 'https://f11.baidu.com/it/u=3087422712,1174175413&fm=72'}
+        {url: 'http://img.zcool.cn/community/01cb11599aaeea0000002129536e52.gif'}
        ]
       }],
       gallery: [],
@@ -27,7 +27,6 @@ class Hot extends Component {
         />
         {this.state.isShow && 
           <Gallery 
-            gallery={this.state.list[0].imgList}
             goIndex={this.state.galleryIndex}
             isShow={this.state.isShow}
             closeView={this.closeView}

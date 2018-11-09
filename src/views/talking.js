@@ -1,8 +1,9 @@
 import React, {Component} from 'react'
+import '../static/less/talking.less'
 class Home extends Component {
   render () {
     return (
-      <div>this is home page</div>
+      <div className=''></div>
     )
   }
 }

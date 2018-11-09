@@ -1,5 +1,9 @@
 import React from 'react'
 import '../static/less/gallery.less'
+import {connect} from 'react-redux'
+@connect(
+  state => ({gallery: state})
+)
 class Gallery extends React.Component {
   constructor (props) {
     super(props)
@@ -22,8 +26,10 @@ class Gallery extends React.Component {
       <div className={['gallery', this.props.isShow && 'open'].join(' ')} onClick={this.closeHandler}>
         <ul className='gallery-list'>
           {this.props.gallery.map((item, index) => (
-            <li key={index} className='galelryItem flex flex-align-center flex-pack-center' >
-              <img src={item.url} alt='imgview'/>
+            <li key={index} className='galelryItem ' >
+              <div className='wrapper flex flex-align-center flex-pack-center'>
+                <img src={item.url} alt='imgview'/>
+              </div>
             </li>
           ))}
         </ul>
@@ -54,13 +60,13 @@ class Gallery extends React.Component {
   
   bindEvent () {
     var gallery = document.querySelector('.gallery-list')
-    gallery.addEventListener('touchstart', this.startHandler);
-    gallery.addEventListener('touchmove', this.moveHandler);
-    gallery.addEventListener('touchend', this.endHandler);
+    gallery.addEventListener('touchstart', this.startHandler)
+    gallery.addEventListener('touchmove', this.moveHandler)
+    gallery.addEventListener('touchend', this.endHandler)
   }
   
   startHandler (event) {
-    event.preventDefault()
+    // event.preventDefault()
     this.setState({
       offsetX: 0,
       startX: event.touches[0].pageX * 1,
@@ -69,7 +75,7 @@ class Gallery extends React.Component {
   }
   
   moveHandler (event) {
-    event.preventDefault()
+    // event.preventDefault()
     var moveX = event.touches[0].pageX * 1 - this.state.startX
     this.setState({
       offsetX: moveX
@@ -79,12 +85,12 @@ class Gallery extends React.Component {
     var lis = document.querySelectorAll('.galelryItem')
     for(i; i < m; i++){
           lis[i] && (lis[i].style.webkitTransition = '-webkit-transform 0s ease-out');
-          lis[i] && (lis[i].style.webkitTransform = 'translate3d('+ ((i-this.state.curIndex)*this.state.winWidth + this.state.offsetX) +'px, 0, 0)');
+          lis[i] && (lis[i].style.webkitTransform = 'translate3d('+ ((i-this.state.curIndex)*this.state.winWidth + this.state.offsetX) +'px, 0, 0)')
         }
   }
   
   endHandler (event) {
-    event.preventDefault()
+    // event.preventDefault()
     // 边界就翻页值
     var boundary = this.state.winWidth/6;
     // 结束时间
@@ -93,23 +99,25 @@ class Gallery extends React.Component {
     
     if (endTime - startTime > 300) {
       if(this.state.offsetX >= boundary){
-        this.goIndex('-1');
+        this.goIndex('-1')
       }else if(this.state.offsetX < 0 && this.state.offsetX < -boundary){
-        this.goIndex('+1');
+        this.goIndex('+1')
       }else{
-        this.goIndex('0');
+        this.goIndex('0')
       }
     } else {
       if (this.state.offsetX === 0) {
-        this.props.closeView()
+        setTimeout(() => {
+          this.props.closeView()
+        }, 200)
         return
       }
       if(this.state.offsetX > 50){
-        this.goIndex('-1');
+        this.goIndex('-1')
       }else if(this.state.offsetX < -50){
-        this.goIndex('+1');
+        this.goIndex('+1')
       }else{
-        this.goIndex('0');
+        this.goIndex('0')
       }
     }
   }
@@ -123,30 +131,32 @@ class Gallery extends React.Component {
       cidx = this.state.curIndex;
     //如果是传字符则为索引的变化
     }else if(typeof n == 'string'){
-      cidx = this.state.curIndex + n * 1;
+      cidx = this.state.curIndex + n * 1
     }
     //当索引右超出
     if(cidx > len - 1){
-      cidx = len - 1;
+      cidx = len - 1
     //当索引左超出  
     }else if(cidx < 0){
-      cidx = 0;
+      cidx = 0
     }
     
     //保留当前索引值
     this.setState({
       curIndex: cidx
     })
-
     //改变过渡的方式，从无动画变为有动画
-    lis[cidx].style.webkitTransition = '-webkit-transform 0.2s ease-out';
-    lis[cidx-1] && (lis[cidx-1].style.webkitTransition = '-webkit-transform 0.2s ease-out');
-    lis[cidx+1] && (lis[cidx+1].style.webkitTransition = '-webkit-transform 0.2s ease-out');
-
+    lis[cidx] && (lis[cidx].style.webkitTransition = '-webkit-transform 0.2s ease-out')
+    lis[cidx - 1] && (lis[cidx - 1].style.webkitTransition = '-webkit-transform 0.2s ease-out')
+    lis[cidx + 1] && (lis[cidx + 1].style.webkitTransition = '-webkit-transform 0.2s ease-out')
+    // 当前可见组的图片可见
+    lis[cidx].style.opacity = 1
+    lis[cidx - 1] && (lis[cidx - 1].style.opacity = 1)
+    lis[cidx + 1] && (lis[cidx + 1].style.opacity = 1)
     //改变动画后所应该的位移值
-    lis[cidx].style.webkitTransform = 'translate3d(0, 0, 0)';
-    lis[cidx-1] && (lis[cidx-1].style.webkitTransform = 'translate3d(-'+ this.state.winWidth +'px, 0, 0)');
-    lis[cidx+1] && (lis[cidx+1].style.webkitTransform = 'translate3d('+ this.state.winWidth +'px, 0, 0)');
+    lis[cidx] && (lis[cidx].style.webkitTransform = 'translate3d(0, 0, 0)');
+    lis[cidx - 1] && (lis[cidx - 1].style.webkitTransform = 'translate3d(-'+ this.state.winWidth +'px, 0, 0)')
+    lis[cidx + 1] && (lis[cidx + 1].style.webkitTransform = 'translate3d('+ this.state.winWidth +'px, 0, 0)')
     
   }
 }
