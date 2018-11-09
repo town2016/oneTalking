@@ -1,0 +1,41 @@
+.nav{
+    position: fixed;
+    z-index: 999;
+    height: 50px;
+    box-sizing: border-box;
+    left: 0;
+    bottom: 0;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    width: 100%;
+    ul{
+        width: 100%;
+        height: 100%;
+        li{
+            height: 100%;
+            text-align: center;
+            a{
+                display: block;
+                width: 100%;
+                height: 100%;
+                color: #aaa;
+                font-size: 10px;
+                .icon-box{
+                    padding: 5px 0;
+                    span{
+                        font-size: 22px;
+                        &:before{
+                            color: #aaa;
+                        }
+                    }
+                }
+            }
+            .active{
+                color: #04528b;
+                span:before{
+                    color: #04528b !important;
+                }
+            }
+        }
+    }
+}
