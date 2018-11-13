@@ -3,7 +3,7 @@ import {BrowserRouter, Route} from 'react-router-dom'
 import Nav from './views/nav'
 import Hot from './views/hot'
 import Talking from './views/talking'
-import User from './views/user'
+import User from './views/my'
 
 class App extends Component {
   render() {

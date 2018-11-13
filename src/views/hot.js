@@ -27,7 +27,6 @@ class Hot extends Component {
         />
         {this.state.isShow && 
           <Gallery 
-            goIndex={this.state.galleryIndex}
             isShow={this.state.isShow}
             closeView={this.closeView}
           />
@@ -38,8 +37,7 @@ class Hot extends Component {
   
   openView (index) {
     this.setState({
-      isShow: true,
-      galleryIndex: index
+      isShow: true
     })
   }
   

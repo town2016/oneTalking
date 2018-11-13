@@ -1,0 +1,69 @@
+.talking{
+    .text-box, .upload-box, .position-box{
+        padding: 10px;
+        textarea{
+            width: 100%;
+            border: none;
+            outline: none;
+            line-height: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+    }
+    .upload-box{
+        .upload-item {
+            width: 30%;
+            position: relative;
+            overflow: hidden;
+            margin-right: 2%;
+            margin-bottom: 2%;
+            float:left; 
+            &::before{
+                content: "";
+                padding-top: 100%;
+                display: block;
+            }
+            img{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                min-width: 100%;
+                min-height: 100%;
+                transform: translate3d(-50%, -50%, 0);
+            }
+        }
+        .uplaod-control{
+            overflow:hidden; 
+            &::before{
+                background-color: #f2f2f2;
+            }
+            input{
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+            }
+            span{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate3d(-50%, -50%, 0);
+                font-size: 30px;
+                font-weight: 10;
+                color: #aaa;
+            }
+        }
+    }
+    .position-box{
+        .icon{
+            font-size: 18px;
+            color: #04528b;
+        }
+        .address{
+            font-size: 14px;
+            padding-left: 14px;
+            color: #04528b;
+        }
+    }
+}

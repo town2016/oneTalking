@@ -2,11 +2,12 @@ import React from 'react'
 import '../static/less/gallery.less'
 import {connect} from 'react-redux'
 @connect(
-  state => ({gallery: state})
+  state => ({gallery: state.gallery.imgList, goIndex: state.gallery.curIndex})
 )
 class Gallery extends React.Component {
   constructor (props) {
     super(props)
+    console.log(this.props)
     this.state = {
       winWidth: window.innerWidth,
       curIndex: 0,

@@ -101,8 +101,8 @@ class List extends React.Component {
   }
   
   openImgView (index, imgList) {
-    this.props.setGallery({imgList: imgList})
-    this.props.openView(index)
+    this.props.setGallery({imgList: imgList, curIndex: index})
+    this.props.openView()
   }
 }
 
