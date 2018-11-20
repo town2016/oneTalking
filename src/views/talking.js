@@ -1,45 +1,107 @@
 import React, {Component} from 'react'
 import '../static/less/talking.less'
+import { connect } from 'react-redux'
+import axios from 'axios'
+import Auth from '../auth';
+import { setPublish } from '../store/talking.redux'
+import { Modal, Toast } from 'antd-mobile'
+import { Prompt } from 'react-router-dom';
+const operation = Modal.operation 
 const AMap = window.AMap
+@connect(
+  state => state.dynamic,
+  { setPublish }
+)
 class Talking extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      locations: '',
+      imgList: [],
+      dynamic: '',
+      longer: null,
+      startTime: 0,
+      isLocationOk: false
+    }
+    this.changeHadler = this.changeHadler
+    this.uploadHandler = this.uploadHandler.bind(this)
+    this.touchStartHandler = this.touchStartHandler.bind(this)
+    this.touchMoveHandler = this.touchMoveHandler.bind(this)
+    this.touchEndHandler = this.touchEndHandler.bind(this)
+    this.deleteHanlder = this.deleteHanlder.bind(this)
+    this.publishHandler = this.publishHandler.bind(this)
+    this.publishCheck = this.publishCheck.bind(this)
+    this.getLocation = this.getLocation.bind(this)
+  }
   render () {
     return (
       <div className='talking'>
+        <Auth/>
+        <div className='toper'>
+          <button className='publish' onClick={this.publishHandler} disabled={!this.props.ispublish}>发表</button>
+        </div>
         <div id='allmap'></div>
         <div className='edit-wrapper'>
           <div className='text-box'>
-            <textarea className='textarea' rows='5' placeholder='你想说点什么......'></textarea>
+            <textarea
+              className='textarea'
+              rows='5'
+              placeholder='你想说点什么......'
+              onChange={this.changeHadler.bind(this, 'dynamic')}>
+            </textarea>
           </div>
           <div className='upload-box clearfix'>
-            <div className='upload-item'>
-              <img src='https://f10.baidu.com/it/u=2465775762,1509670197&fm=72'/>
-            </div>
+            {this.state.imgList.map((item, index) => (
+              <div className='upload-item' key={index} 
+                onTouchStart={this.touchStartHandler.bind(this, item, index)}
+                onTouchMove={this.touchMoveHandler}
+                onTouchEnd={this.touchEndHandler}>
+                <img src={item} alt='img'/>
+              </div>
+            ))}
             <div className='uplaod-control upload-item'>
-              <span className='icon-add'></span>
-              <input type='file' multiple="multiple" accept="image/*"/>
+              <form id='imgForm'>
+                <span className='icon-add'></span>
+                <input type='file' name='files' multiple="multiple" accept="image/*" onChange={this.uploadHandler} id='uploadControl'/>
+              </form>
             </div>
           </div>
-          <div className='position-box flex flex-align-center'>
+          <div className='position-box flex flex-align-center' onClick={this.getLocation}>
             <span className='icon-location_fill icon'></span>
-            <span className='address flex-1'>中投商务中心</span>
+            <span className='address flex-1'>{this.state.locations}</span>
           </div>
+          <Prompt message={'是否放弃本次编辑?'}  when={this.props.ispublish}/>
         </div>
-        
       </div>
     )
   }
   componentDidMount () {
+    setTimeout(() => {
+      this.getLocation()
+    }, 500)
+  }
+  // 表单
+  changeHadler (k, event) {
+    this.setState({
+      [k]: event.target.value
+    }, () => {
+      this.publishCheck()
+    })
+  }
+  // 定位
+  getLocation () {
+    this.setState({locations: '定位中...'})
     var map = new AMap.Map('allmap', {
       resizeEnable: true,
       zoom: 14
     })
-    
+    var that = this
     map.plugin('AMap.Geolocation', function() {
       var geolocation = new AMap.Geolocation({
         // 是否使用高精度定位，默认：true
         enableHighAccuracy: true,
         // 设置定位超时时间，默认：无穷大
-        timeout: 10000,
+        timeout: 5000,
         // 定位按钮的停靠位置的偏移量，默认：Pixel(10, 20)
         buttonOffset: new AMap.Pixel(10, 20),
         //  定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
@@ -53,26 +115,19 @@ class Talking extends Component {
       AMap.event.addListener(geolocation, 'error', onError)
     
       function onComplete (data) {
-        // data是具体的定位信息
-        console.log(data)
-        map.setZoomAndCenter(14, [data.position.lng,data.position.lat]);
-        // 在新中心点添加 marker 
-        var center = new AMap.Marker({
-            map: map,
-            title: '中投国际大厦',
-            position: [data.position.lng,data.position.lat]
-        });
-        center.setTitle(data.addressComponent.building)
-        center.setLabel({
-            //修改label相对于maker的位置
-            offset: new AMap.Pixel(10, 20),
-            content: '<div class="info">'+ data.addressComponent.building +'</div>'
-        });
+       that.setState({
+         locations: data.formattedAddress.split('区')[1],
+         isLocationOk: true
+       })
         aMapSearchNearBy([data.position.lng,data.position.lat], data.addressComponent.city)
       }
     
       function onError (data) {
-        document.getElementById('result').innerHTML = '获取位置信息失败，请稍后重试'
+        setTimeout(() => {
+          that.setState({
+           locations: '获取位置信息失败，请稍后重试'
+          })
+        }, 200)
       }
     })
     
@@ -90,16 +145,100 @@ class Talking extends Component {
           // 第四个参数为回调函数
           placeSearch.searchNearBy('', centerPoint, 200, function(status, result) {
             if(result.info === 'OK') {
-                var locationList = result.poiList.pois; // 周边地标建筑列表
+                // var locationList = result.poiList.pois; // 周边地标建筑列表
             } else {
                  console.log('获取位置信息失败!');
             }
           });
        });
     }
-    
   }
-
+  // 图片上传
+  uploadHandler () {
+    var formData = new FormData(document.getElementById('imgForm'))
+    document.getElementById('uploadControl').value = ''
+    axios.post('/api/fileUpload', formData).then(res => {
+      if (res.data.code === global.dictionary.ERR_OK) {
+        this.setState({
+          imgList: this.state.imgList.concat(res.data.data)
+        })
+        this.publishCheck()
+      }
+    })
+  }
+  
+  // 图片长按事件
+  touchStartHandler (img, index, event) {
+    event.preventDefault()
+    this.setState({
+      longer: setTimeout(() => {
+        operation([
+          { text: '删除图片', onPress: () => {
+              this.deleteHanlder(img, index)
+            }
+          }
+        ])
+      }, 600),
+      startTime: new Date().getTime()
+    })
+  }
+  touchMoveHandler (event) {
+    event.preventDefault()
+    window.clearTimeout(this.state.longer)
+  }
+  touchEndHandler (event) {
+    event.preventDefault()
+    let endTime = new Date().getTime()
+    if (endTime - this.state.startTime < 500) {
+      window.clearTimeout(this.state.longer)
+    }
+  }
+  // 图片删除
+  deleteHanlder (item, index) {
+    var filePath = item.split('/')
+    var fileName = filePath[filePath.length - 1]
+    axios.get('/api/fileDelete', {params: {fileName: fileName}}).then(res => {
+      if (res.data.code === global.dictionary.ERR_OK) {
+        Toast.success(res.data.message, 2, null, false)
+        var imgList = this.state.imgList
+        imgList.splice(index, 1)
+        this.setState({
+          imgList: imgList
+        }, () => {
+          this.publishCheck()
+        })
+      } else {
+        Toast.fail(res.data.message, 2, null, false)
+      }
+    })
+  }
+  publishCheck () {
+    if (this.state.dynamic.trim().length === 0 && this.state.imgList.length === 0) {
+      this.props.setPublish({ispublish: false})
+    } else {
+      this.props.setPublish({ispublish: true})
+    } 
+  }
+  // 发表动态
+  publishHandler () {
+    var params = {
+      dynamic: this.state.dynamic,
+      locations: this.state.isLocationOk ? this.state.locations : '',
+      imgList: this.state.imgList
+    }
+    axios.post('/api/createDynamic', params).then(res => {
+      if (res.data.code === global.dictionary.ERR_OK) {
+        this.props.setPublish({ispublish: false})
+        this.props.history.push('/hot')
+      } else {
+        Toast.fail(res.data.message, 2, null, false)
+      }
+    })
+  }
+  componentWillUnmount () {
+    this.props.setPublish({ispublish: false})
+  }
+  
 }
 
 export default Talking

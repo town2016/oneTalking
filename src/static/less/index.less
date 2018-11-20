@@ -2,8 +2,14 @@
 html {
   height: 100%;
   width: 100%;
-  font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,\\5FAE\8F6F\96C5\9ED1,Arial,sans-serif;
+  font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,\\5FAE\8F6F\96C5\9ED1,Arial,sans-serif !important;
   -webkit-font-smoothing: antialiased;
+}
+button{
+  font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,\\5FAE\8F6F\96C5\9ED1,Arial,sans-serif !important;
+  outline: none;
+  background: none;
+  border: none;
 }
 *::-webkit-scrollbar{
     width: 6px;
@@ -21,7 +27,7 @@ html {
       background: rgba(0,0,0,0.1);
   }
 body{
-  background-color: #ffffff;
+  background-color: #ffffff !important;
   color: #4e4e4e;
   margin: 0;
   padding: 0;
@@ -29,6 +35,10 @@ body{
   width: 100%;
   -webkit-font-smoothing: antialiased;
   -webkit-overflow-scrolling: touch;
+}
+input::-webkit-input-placeholder{
+    color: #e5e5e5;
+    font-weight: 200;
 }
 textarea{
     font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,\\5FAE\8F6F\96C5\9ED1,Arial,sans-serif;

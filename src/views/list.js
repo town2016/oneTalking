@@ -3,7 +3,7 @@ import '../static/less/list.less'
 import {avatar, commentIcon} from '../static/img/images.js'
 import moment from 'moment'
 import {connect} from 'react-redux'
-import {setGallery} from '../store/hot'
+import {setGallery} from '../store/hot.redux'
 @connect(
   null,
   {setGallery}
@@ -29,31 +29,31 @@ class List extends React.Component {
               <div className='flex-1 item-body'>
 
                 <div className='item-top'>
-                  <p className='name'>小投君</p>
-                  <p className='title'>环境优雅,舒适宜人,点个赞,环境优雅,舒适宜人,点个赞环境优雅,舒适宜人,</p>
+                  <p className='name'>{item.user.account}</p>
+                  <p className='title'>{item.dynamic}</p>
                   {(item.imgList && item.imgList.length !== 0) && 
                     <div className='item-content'>
                       { item.imgList.length > 1 &&
                         <ul className='imgList clearfix'>
                           {item.imgList.map((imgItem, imgIndex) => (
                             <li className='imgItem' key={imgIndex} onClick={this.openImgView.bind(this, imgIndex, item.imgList)}>
-                              <img src={imgItem.url} alt='img'/>
+                              <img src={imgItem} alt='img'/>
                             </li>
                           ))}
                         </ul>
                       }
                       {item.imgList.length === 1 &&
                         <div className='img-border' onClick={this.openImgView.bind(this, 0, item.imgList)}>
-                          <img src={item.imgList[0].url} width='100%' alt='img'/>
+                          <img src={item.imgList[0]} width='100%' alt='img'/>
                         </div>
                       }
                     </div>
                   }
                 </div>
-                
+                {item.locations ? <p className='location'>{item.locations}</p> : null}
                 <div className='item-bottom flex flex-pack-justify flex-align-center'>
                   <div className='times'>
-                    {moment(new Date(item.time ? item.time : new Date().getTime())).format('MM-DD HH:mm:ss')}
+                    {moment(new Date(item.createTime ? item.createTime : new Date().getTime())).format('MM-DD HH:mm:ss')}
                   </div>
                   <div className='action-air'>
                     <div className='action-sheet'>
@@ -66,7 +66,7 @@ class List extends React.Component {
                   </div>
                 </div>
                 
-                {(item.praiseList || item.commentList)}
+                {(item.praiseList || item.commentList) ?
                 <div className='comment-wrapper'>
                   {(item.praiseList && item.praiseList.length > 0) &&
                     <div className='praise-air'>
@@ -83,7 +83,7 @@ class List extends React.Component {
                       </li>
                     </ul>
                   </div>
-                </div>
+                </div> : null}
                 
               </div>
               

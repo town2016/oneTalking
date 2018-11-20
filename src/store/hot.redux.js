@@ -14,6 +14,7 @@ export function gallery (state = {imgList: [], curIndex: 0}, action) {
 export function setGallery (obj = {}) {
   return Object.assign({}, {type: SET}, obj) 
 }
+
 // 异步设置state
 /* export function setGalleryAsync (obj = {}) {
   return dispatch => {

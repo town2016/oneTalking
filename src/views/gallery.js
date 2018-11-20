@@ -29,7 +29,7 @@ class Gallery extends React.Component {
           {this.props.gallery.map((item, index) => (
             <li key={index} className='galelryItem ' >
               <div className='wrapper flex flex-align-center flex-pack-center'>
-                <img src={item.url} alt='imgview'/>
+                <img src={item} alt='imgview'/>
               </div>
             </li>
           ))}
