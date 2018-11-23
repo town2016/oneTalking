@@ -1,13 +1,13 @@
 import React from 'react'
 import { logo } from './static/img/images'
 import { connect } from 'react-redux'
-import { register, errMsg } from './store/user.redux'
-import { Redirect } from 'react-router-dom'
+import { register, errMsg, setAuth } from './store/user.redux'
+import { Redirect, Link } from 'react-router-dom'
 import { rules } from './static/js/validate'
 import './static/less/register.less'
 @connect(
   state => state.user,
-  { register, errMsg }
+  { register, errMsg, setAuth }
 )
 class Register extends React.Component {
   constructor (props) {
@@ -60,6 +60,9 @@ class Register extends React.Component {
         <div className='btn-wrapper'>
           <button onClick={this.formValite} disabled={this.state.loading}>注册</button>
         </div>
+        <div className='look-around'>
+          <Link to='/auth/login' style={{display: 'inline-block', padding: '10px 0'}}>已有账号,去登陆</Link>
+        </div>
       </div>
     )
   }
@@ -94,6 +97,12 @@ class Register extends React.Component {
     this.setState({
       [k]: value
     })
+  }
+  // 组件卸载
+  componentWillUnmount () {
+    if (this.props.message) {
+      this.props.setAuth({message: ''})
+    }
   }
 }
 

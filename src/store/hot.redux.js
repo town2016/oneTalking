@@ -1,3 +1,4 @@
+import axios from 'axios'
 // gallery reducer
 const SET = 'set'
 
@@ -15,11 +16,9 @@ export function setGallery (obj = {}) {
   return Object.assign({}, {type: SET}, obj) 
 }
 
-// 异步设置state
-/* export function setGalleryAsync (obj = {}) {
+// 点赞或取消点赞
+export function pariseOrCancel (params) {
   return dispatch => {
-    setTimeout(() => {
-      dispatch(setGallery(obj))
-    }, 2000)
+    return axios.get('/api/parise', {params: params})
   }
-} */
+}

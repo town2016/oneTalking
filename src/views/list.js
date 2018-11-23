@@ -3,10 +3,11 @@ import '../static/less/list.less'
 import {avatar, commentIcon} from '../static/img/images.js'
 import moment from 'moment'
 import {connect} from 'react-redux'
-import {setGallery} from '../store/hot.redux'
+import {setGallery, pariseOrCancel} from '../store/hot.redux'
+import { Toast } from 'antd-mobile'
 @connect(
   null,
-  {setGallery}
+  {setGallery, pariseOrCancel}
 )
 class List extends React.Component {
   constructor (props) {
@@ -23,13 +24,13 @@ class List extends React.Component {
             
             <li className='list-item flex' key={index}>
               <div className='avatar'>
-                <img src={item.avatar ? item.avatar : avatar} alt='avatar'/>
+                <img src={(item.user && item.user.avatar) ? item.user.avatar : avatar} alt='avatar'/>
               </div>
               
               <div className='flex-1 item-body'>
 
                 <div className='item-top'>
-                  <p className='name'>{item.user.account}</p>
+                  <p className='name'>{item.user && item.user.account}</p>
                   <p className='title'>{item.dynamic}</p>
                   {(item.imgList && item.imgList.length !== 0) && 
                     <div className='item-content'>
@@ -57,7 +58,7 @@ class List extends React.Component {
                   </div>
                   <div className='action-air'>
                     <div className='action-sheet'>
-                      <a href='void:;'><span className='icon-appreciate_fill_light'></span>{!item.praise ? '点赞':'取消'}</a>
+                      <a href='void:;' onClick={this.pariseOrCancel.bind(this, item)}><span className='icon-appreciate_fill_light'></span>{!item.praise ? '点赞':'取消'}</a>
                       <a href='void:;'><span className='icon-comment_fill_light'></span>评论</a>
                     </div>
                     <div className='icon-wrapper' onClick={this.openActiobSheet}>
@@ -95,14 +96,27 @@ class List extends React.Component {
     )
   }
   
+  // 打开点赞/评论操作面板
   openActiobSheet (e) {
     var actionSheet = e.target.parentNode.previousElementSibling
     actionSheet.classList.toggle('opend')
   }
-  
+  // 打开图片预览
   openImgView (index, imgList) {
     this.props.setGallery({imgList: imgList, curIndex: index})
     this.props.openView()
+  }
+  
+  // 点赞 
+  pariseOrCancel (dynamic) {
+    this.props.pariseOrCancel({id: dynamic._id}).then(res => {
+      if (res.data.code === global.dictionary.ERR_OK) {
+        if (res.data.data === 'cancel') {
+        }
+      } else {
+        Toast.fail(res.data.message, 2)
+      }
+    })
   }
 }
 

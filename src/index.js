@@ -4,6 +4,7 @@ import './static/less/index.less'
 import App from './App';
 import Register from './register';
 import Login from './login';
+import './config'
 import * as serviceWorker from './serviceWorker';
 import { createStore, applyMiddleware} from 'redux'
 import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
@@ -13,9 +14,11 @@ import { Provider } from 'react-redux'
 import 'antd-mobile/dist/antd-mobile.css';
 import { Modal } from 'antd-mobile'
 const alert = Modal.alert
-window.dictionary = {ERR_OK: 200}
 const store = createStore(reducers, applyMiddleware(thunk))
 class Index extends React.Component {
+  constructor () {
+    super()
+  }
   render () {
     const getConfirmation = (message,callback) => {
       alert('提示', message, [

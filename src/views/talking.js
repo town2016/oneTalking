@@ -9,19 +9,20 @@ import { Prompt } from 'react-router-dom';
 const operation = Modal.operation 
 const AMap = window.AMap
 @connect(
-  state => state.dynamic,
+  state => {return {...state.dynamic, ...state.user}},
   { setPublish }
 )
 class Talking extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      locations: '',
+      locations: '添加位置信息',
       imgList: [],
       dynamic: '',
       longer: null,
       startTime: 0,
-      isLocationOk: false
+      isLocationOk: false,
+      isUnMount: false
     }
     this.changeHadler = this.changeHadler
     this.uploadHandler = this.uploadHandler.bind(this)
@@ -31,7 +32,6 @@ class Talking extends Component {
     this.deleteHanlder = this.deleteHanlder.bind(this)
     this.publishHandler = this.publishHandler.bind(this)
     this.publishCheck = this.publishCheck.bind(this)
-    this.getLocation = this.getLocation.bind(this)
   }
   render () {
     return (
@@ -66,19 +66,14 @@ class Talking extends Component {
               </form>
             </div>
           </div>
-          <div className='position-box flex flex-align-center' onClick={this.getLocation}>
+          <div className='position-box flex flex-align-center' onClick={this.getLocation.bind(this)}>
             <span className='icon-location_fill icon'></span>
-            <span className='address flex-1'>{this.state.locations}</span>
+            <span className='address flex-1' style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{this.state.locations}</span>
           </div>
           <Prompt message={'是否放弃本次编辑?'}  when={this.props.ispublish}/>
         </div>
       </div>
     )
-  }
-  componentDidMount () {
-    setTimeout(() => {
-      this.getLocation()
-    }, 500)
   }
   // 表单
   changeHadler (k, event) {
@@ -90,7 +85,6 @@ class Talking extends Component {
   }
   // 定位
   getLocation () {
-    this.setState({locations: '定位中...'})
     var map = new AMap.Map('allmap', {
       resizeEnable: true,
       zoom: 14
@@ -109,25 +103,30 @@ class Talking extends Component {
         //  定位按钮的排放位置,  RB表示右下
         buttonPosition: 'RB'
       })
-    
+      that.setState({locations: '定位中...'})
       geolocation.getCurrentPosition()
       AMap.event.addListener(geolocation, 'complete', onComplete)
       AMap.event.addListener(geolocation, 'error', onError)
     
       function onComplete (data) {
-       that.setState({
-         locations: data.formattedAddress.split('区')[1],
-         isLocationOk: true
-       })
+        if (!that.state.isUnMount) {
+          console.log(data)
+          that.setState({
+            locations: data.formattedAddress ? data.formattedAddress.split('区')[1] : '获取位置信息失败',
+            isLocationOk: true
+          })
+        }
         aMapSearchNearBy([data.position.lng,data.position.lat], data.addressComponent.city)
       }
     
       function onError (data) {
-        setTimeout(() => {
-          that.setState({
-           locations: '获取位置信息失败，请稍后重试'
-          })
-        }, 200)
+        if (!that.state.isUnMount) {
+          setTimeout(() => {
+            that.setState({
+             locations: '获取位置信息失败，请稍后重试'
+            })
+          }, 200)
+        }
       }
     })
     
@@ -163,6 +162,8 @@ class Talking extends Component {
           imgList: this.state.imgList.concat(res.data.data)
         })
         this.publishCheck()
+      } else {
+        Toast.fail(res.data.message, 2, null, false)
       }
     })
   }
@@ -236,6 +237,9 @@ class Talking extends Component {
     })
   }
   componentWillUnmount () {
+    this.setState({
+      isUnMount: true
+    })
     this.props.setPublish({ispublish: false})
   }
   

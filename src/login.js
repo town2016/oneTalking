@@ -1,13 +1,13 @@
 import React from 'react'
 import { logo } from './static/img/images'
 import { connect } from 'react-redux'
-import { login, errMsg } from './store/user.redux'
+import { login, errMsg, setAuth } from './store/user.redux'
 import { Redirect, Link } from 'react-router-dom'
 import { rules } from './static/js/validate'
 import './static/less/register.less'
 @connect(
   state => state.user,
-  { login, errMsg }
+  { login, errMsg, setAuth }
 )
 class Login extends React.Component {
   constructor (props) {
@@ -16,13 +16,14 @@ class Login extends React.Component {
       account: '',
       pwd: ''
     }
+    sessionStorage.clear()
     this.formValite = this.formValite.bind(this)
     this.goHot = this.goHot.bind(this)
   }
   render () {
     return (
       <div className='register auth-wrapper'> 
-        { this.props.redirectTo ? <Redirect to={this.props.redirectTo}></Redirect> : null}
+        { this.props.isAuth && this.props.redirectTo ? <Redirect to={this.props.redirectTo}></Redirect> : null}
         <div className='logo'>
           <img src={logo} alt='logo'/>
         </div>
@@ -59,16 +60,19 @@ class Login extends React.Component {
   
   // 添加返回时间监听
   componentDidMount () {
-    window.addEventListener('popstate',(state) => {
-      this.goHot() 
+    window.addEventListener('popstate',(event) => {
+      /*if (this.props.location.pathname === '/auth/login') {
+        window.history.forward();
+        this.goHot()
+      }*/
     })
   }
   
   // 返回
   goHot () {
     this.props.history.push('/hot')
-  }
-  
+  } 
+  // 表单验证
   formValite () {
     if (!rules.required(this.state.account)) {
       this.props.errMsg({message: '账户不能为空'})
@@ -86,11 +90,18 @@ class Login extends React.Component {
     }
     this.props.login(params)
   }
+  // 表单赋值
   handlerChange (k, event) {
     var value = event.target.value
     this.setState({
       [k]: value
     })
+  }
+  // 组件卸载
+  componentWillUnmount () {
+    if (this.props.message) {
+      this.props.setAuth({message: ''})
+    }
   }
 }
 

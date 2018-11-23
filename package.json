@@ -26,6 +26,7 @@
     "eslint-plugin-import": "2.14.0",
     "eslint-plugin-jsx-a11y": "6.1.2",
     "eslint-plugin-react": "7.11.1",
+    "express-session": "^1.15.6",
     "file-loader": "2.0.0",
     "fork-ts-checker-webpack-plugin-alt": "0.4.14",
     "fs-extra": "7.0.0",
@@ -37,6 +38,7 @@
     "js-cookie": "^2.2.0",
     "mini-css-extract-plugin": "0.4.3",
     "moment": "^2.22.2",
+    "nedb-session-store": "^1.1.2",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.1.0",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -120,7 +122,15 @@
     "presets": [
       "react-app"
     ],
-    "plugins":[["import", {"libraryName": "antd", "style": "css"}]]
+    "plugins": [
+      [
+        "import",
+        {
+          "libraryName": "antd",
+          "style": "css"
+        }
+      ]
+    ]
   },
   "proxy": "http://localhost:8080",
   "devDependencies": {
