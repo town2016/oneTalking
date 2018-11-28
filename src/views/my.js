@@ -107,7 +107,6 @@ class My extends React.Component {
   }
   // 更新头像
   avatarChange (event) {
-    var files = event.target.files
     var formData = new FormData(document.getElementById('avatarForm'))
     axios.post('/api/fileUpload', formData).then(res => {
       if (res.data.code === global.dictionary.ERR_OK) {

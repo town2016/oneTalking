@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Route, Switch, withRouter} from 'react-router-dom'
+import {Route, Switch, Redirect, history} from 'react-router-dom'
 import Nav from './views/nav'
 import Hot from './views/hot'
 import Talking from './views/talking'
@@ -8,7 +8,16 @@ import Logs from './views/logs'
 import './static/less/app.less'
 import axios from 'axios'
 class App extends Component {
-  
+  constructor (props) {
+    super(props)
+    axios.interceptors.response.use(function (res) {
+      if (res.data.code === 401) {
+        return res
+      } else {
+        return res
+      }
+    })
+  }
   render() {
     return (
       <div className="App">
@@ -22,25 +31,6 @@ class App extends Component {
           </Switch>
         </div>
       </div>
-    );
-  }
-}
-@withRouter
-class PrivateRoute extends Component{
-  constructor ({ component: Component, ...rest }) {
-    super()
-    var sessionId = ''
-    return (
-      <Route
-        {...rest}
-        render={props =>
-          sessionId? (
-            <Component {...props} />
-          ) : (
-            this.props.history.replace('/auth/login')
-          )
-        }
-      />
     );
   }
 }

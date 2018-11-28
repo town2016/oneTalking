@@ -22,3 +22,10 @@ export function pariseOrCancel (params) {
     return axios.get('/api/parise', {params: params})
   }
 }
+
+// 评论
+export function saveComment (params) {
+  return dispatch => {
+    return axios.post('/api/commentSave', params || {})
+  }
+}

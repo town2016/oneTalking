@@ -6,7 +6,7 @@ import { setAuth, getUserInfo } from '../store/user.redux'
 import { NavBar } from 'antd-mobile'
 import axios from 'axios'
 @connect (
-  state => state.user,
+  state => state,
   { setAuth, getUserInfo }
 )
 class Hot extends Component {
@@ -25,6 +25,8 @@ class Hot extends Component {
     this.closeView = this.closeView.bind(this)
     this.getDynamicList = this.getDynamicList.bind(this)
     this.goCenter = this.goCenter.bind(this)
+    this.updatePraise = this.updatePraise.bind(this)
+    this.updateComment = this.updateComment.bind(this)
   }
   componentDidMount () {
     this.getDynamicList()
@@ -45,6 +47,8 @@ class Hot extends Component {
         <List
           list={this.state.list}
           openView={this.openView}
+          updatePraise={this.updatePraise}
+          updateComment={this.updateComment}
         />
         {this.state.isShow && 
           <Gallery 
@@ -57,6 +61,7 @@ class Hot extends Component {
   }
   // 更新动态列表
   getDynamicList () {
+    console.log(this.props)
     var params = {
       pageNumber: this.state.pageNumber
     }
@@ -95,6 +100,34 @@ class Hot extends Component {
       }
     })
   }
+  // 更新点赞状态
+  updatePraise (index, data) {
+    var list = [...this.state.list]
+    if (data.opt === 'cancel') {
+      this.state.list[index].praises.map((item, cindex) => {
+        if (item._id.toString() === data._id.toString()) {
+          list[index].praised = []
+          list[index].praises.splice(cindex, 1)
+        }
+      })
+    } else {
+      delete data.opt
+      list[index].praised.push(data)
+      list[index].praises.push(data)
+    }
+    this.setState({
+      list: list
+    })
+    console.log(this.state.list)
+  }
+  // 更新评论列表
+  updateComment (index, data) {
+    var list = [...this.state.list]
+    list[index].comments.push(data)
+    this.setState({
+      list: list
+    })
+  }
   // 判断页面是否滚动到底部
   isToLoad () {
     var scrollTop = document.documentElement.scrollTop || document.body.scrollTop
@@ -103,7 +136,7 @@ class Hot extends Component {
     if (scrollHeight <= (scrollTop + winHeigt)) {
       if (this.state.totalNum >= (this.state.pageNumber + 1)) {
         this.setState({
-          pageNumber: ++this.state.pageNumber
+          pageNumber: this.state.pageNumber * 1 + 1
         })
         if (!this.state.isLoading) {
           this.getDynamicList()
@@ -129,7 +162,7 @@ class Hot extends Component {
         }, wait)
     }
   }
-  
+  // 加载完成之后页面向上滚动
   componentDidUpdate () {
     if (this.state.pageNumber > 1) {
       var duration = 0
@@ -143,7 +176,6 @@ class Hot extends Component {
       }, 20)
     }
   }
-  
 }
 
 export default Hot

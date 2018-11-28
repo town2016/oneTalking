@@ -81,6 +81,7 @@ export let eventHandler = {
     if(!sign) throw new Error('请传入父节点的标识')
     var type = sign.charAt(0) === '.' ? 'class' : sign.charAt(0) === '#' ? 'id' : 'tag',
       parent = el.parentNode
+      sign = sign.substr(1)
     if(parent === document) {
       return document.querySelector('html')
     }

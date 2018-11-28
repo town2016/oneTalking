@@ -3,11 +3,13 @@ import '../static/less/list.less'
 import {avatar, commentIcon} from '../static/img/images.js'
 import moment from 'moment'
 import {connect} from 'react-redux'
-import {setGallery, pariseOrCancel} from '../store/hot.redux'
-import { Toast } from 'antd-mobile'
+import {setGallery, pariseOrCancel, saveComment} from '../store/hot.redux'
+import { Toast, Modal } from 'antd-mobile'
+import { eventHandler } from '../static/js/common'
+const confirm = Modal.prompt
 @connect(
   null,
-  {setGallery, pariseOrCancel}
+  {setGallery, pariseOrCancel, saveComment}
 )
 class List extends React.Component {
   constructor (props) {
@@ -58,8 +60,8 @@ class List extends React.Component {
                   </div>
                   <div className='action-air'>
                     <div className='action-sheet'>
-                      <a href='void:;' onClick={this.pariseOrCancel.bind(this, item)}><span className='icon-appreciate_fill_light'></span>{!item.praise ? '点赞':'取消'}</a>
-                      <a href='void:;'><span className='icon-comment_fill_light'></span>评论</a>
+                      <a href='void:;' onClick={this.pariseOrCancel.bind(this, item, index)}><span className='icon-appreciate_fill_light'></span>{!item.praised.length > 0 ? '点赞':'取消'}</a>
+                      <a href='void:;' onClick={this.comment.bind(this, item, index)}><span className='icon-comment_fill_light'></span>评论</a>
                     </div>
                     <div className='icon-wrapper' onClick={this.openActiobSheet}>
                       <img src={commentIcon} width='19px' alt='commentIcon'/>
@@ -67,23 +69,28 @@ class List extends React.Component {
                   </div>
                 </div>
                 
-                {(item.praiseList || item.commentList) ?
+                {((item.praises && item.praises.length > 0)  || (item.comments && item.comments.length > 0)) ?
                 <div className='comment-wrapper'>
-                  {(item.praiseList && item.praiseList.length > 0) &&
+                  {(item.praises && item.praises.length > 0) &&
                     <div className='praise-air'>
                       <span className='icon-appreciate_fill_light'></span>
-                      {item.praiseList.map((nameItem, index) => (
-                        <span key={index}>{nameItem.name}</span>
+                      {item.praises.map((user, index) => (
+                        <span key={index}>{user.account}</span>
                       ))}
                     </div>
                   }
-                  <div className='comment-air'>
-                    <ul className='comment-list'>
-                      <li className='comment-item'>
-                        <span className='commenter'>南方 : </span><span className='comment-text'>1231212412341243qwerqwrqwerqwrqwrqwrqwrqewrqwrqwer12</span>
-                      </li>
-                    </ul>
-                  </div>
+                  {(item.comments && item.comments.length > 0) && 
+                    <div className='comment-air'>
+                      <ul className='comment-list'>
+                        {item.comments.map((comment, index) => (
+                          <li className='comment-item' key={index}>
+                            <span className='commenter'>{comment.userName} : </span>
+                            <span className='comment-text'>{comment.content}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  }
                 </div> : null}
                 
               </div>
@@ -108,15 +115,41 @@ class List extends React.Component {
   }
   
   // 点赞 
-  pariseOrCancel (dynamic) {
+  pariseOrCancel (dynamic, index, event) {
+    var actionSheet = eventHandler.getParent(event.target, '.action-sheet')
     this.props.pariseOrCancel({id: dynamic._id}).then(res => {
       if (res.data.code === global.dictionary.ERR_OK) {
-        if (res.data.data === 'cancel') {
-        }
+        // Toast.info(res.data.message, 1)
+        actionSheet.classList.remove('opend')
+        this.props.updatePraise(index, res.data.data)
       } else {
         Toast.fail(res.data.message, 2)
       }
     })
+  }
+  // 评论
+  comment (dynamic, index, event) {
+    var actionSheet = eventHandler.getParent(event.target, '.action-sheet')
+    confirm( null, '请发表高见......',[
+      { text: '取消', onPress: () => {} },
+      { text: '确定', onPress: (value) => {
+          this.props.saveComment({dynamic: dynamic._id, content: value})
+          .then(res => {
+            if (res.data.code === global.dictionary.ERR_OK) {
+              this.props.updateComment(index, res.data.data)
+              // Toast.success(res.data.message, 1)
+              actionSheet.classList.remove('opend')
+            } else {
+              Toast.fail(res.data.message, 1)
+            }
+          })
+        } 
+      },
+    ])
+  }
+  
+  shouldComponentUpdate (nextProps, nextState) {
+    return true
   }
 }
 

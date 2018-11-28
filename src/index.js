@@ -16,9 +16,6 @@ import { Modal } from 'antd-mobile'
 const alert = Modal.alert
 const store = createStore(reducers, applyMiddleware(thunk))
 class Index extends React.Component {
-  constructor () {
-    super()
-  }
   render () {
     const getConfirmation = (message,callback) => {
       alert('提示', message, [

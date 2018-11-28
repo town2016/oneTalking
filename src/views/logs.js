@@ -40,12 +40,12 @@ class Logs extends React.Component {
                 ) : null}
                 <div className='operation-panel flex flex-pack-justify'>
                   <div className='operation-item flex-1 flex flex-pack-center flex-align-center'>
-                    <span className='icon-appreciate_light'></span>10
+                    <span className='icon-appreciate_light'></span>{item.praises.length}
                   </div>
                   <div className='operation-item flex-1 flex flex-pack-center flex-align-center'>
-                    <span className='icon-comment_light'></span>10
+                    <span className='icon-comment_light'></span>{item.comments.length}
                   </div>
-                  <div className='operation-item flex-1 flex flex-pack-center flex-align-center'>
+                  <div className='operation-item flex-1 flex flex-pack-center flex-align-center' onClick={this.deleteDynamic.bind(this, item, index)}>
                     <span className='icon-delete'></span>
                   </div>
                 </div>
@@ -83,6 +83,23 @@ class Logs extends React.Component {
       this.setState({
         isLoading: false
       })
+    })
+  }
+  
+  // 删除动态
+  deleteDynamic (dynamic, index) {
+    axios.get('/api/dynamicDelete', {params: {id: dynamic._id}})
+    .then(res => {
+      if (res.data.code === global.dictionary.ERR_OK) {
+        var list = [...this.state.list]
+        list.splice(index, 1)
+        this.setState({
+          list: list
+        })
+        Toast.success(res.data.message, 1)
+      } else {
+        Toast.fail(res.data.message, 2)
+      }
     })
   }
   
