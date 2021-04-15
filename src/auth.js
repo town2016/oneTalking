@@ -33,5 +33,4 @@ class Auth extends React.Component {
     return null
   }
 }
-
 export default Auth
